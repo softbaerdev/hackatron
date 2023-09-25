@@ -1,6 +1,6 @@
 package de.fossag.hackatron;
 
-public class DummyHackatronClient implements IHackatronClient {
+public class HackatronClient implements IHackatronClient {
 
   private IMessageSender messageSender;
   private static final String CLIENT_NAME = "dummyclient";

@@ -8,7 +8,7 @@ public class Main {
     HackatronWrapper client = new HackatronWrapper(
         "hackatron.de",
         4000,
-        new DummyHackatronClient());
+        new HackatronClient());
     client.run();
   }
 }
