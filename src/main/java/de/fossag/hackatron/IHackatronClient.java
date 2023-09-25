@@ -1,4 +1,4 @@
-package de.fossag;
+package de.fossag.hackatron;
 
 public interface IHackatronClient {
 

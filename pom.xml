@@ -22,7 +22,7 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>de.fossag.Main</mainClass>
+          <mainClass>de.fossag.hackatron.Main</mainClass>
         </configuration>
       </plugin>
     </plugins>
@@ -32,7 +32,7 @@
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <exec.mainClass>de.fossag.Main</exec.mainClass>
+    <exec.mainClass>de.fossag.hackatron.Main</exec.mainClass>
   </properties>
 
 </project>
