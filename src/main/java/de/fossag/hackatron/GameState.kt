@@ -48,15 +48,23 @@ class GameState(val width: Int, val height: Int, val currentPlayer: Int) {
         visited.add(pos)
         while (queue.isNotEmpty()) {
             val currentPos = queue.removeFirst()
-            var bla = Move.entries.toTypedArray().map {  it.applyToPos(currentPos, this)}
+            var bla = Move.randomEntries.toTypedArray().map {  it.applyToPos(currentPos, this)}
             bla.forEach {
-                if (canMoveTo(it) && !visited.contains(it)) {
+                if (canMoveTo(it) && !visited.contains(it) && !queue.contains(it)) {
                     queue.add(it)
                 }
             }
             visited.add(currentPos)
         }
         return visited.count()
+    }
+
+    fun enemiesCanMoveTo(): List<Coord> {
+        val otherPlayerHeads = playerHeads - currentPlayer
+        val result = otherPlayerHeads
+                .map { (_, playerHead) -> Move.randomEntries.map {it.applyToPos(playerHead, this)} }
+                .flatten()
+        return result
     }
 
     override fun toString(): String {

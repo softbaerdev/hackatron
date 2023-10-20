@@ -1,5 +1,8 @@
 package de.fossag.hackatron
 
+import java.util.Random
+import kotlin.enums.EnumEntries
+
 enum class Move(private val text: String) {
     Up("up"),
     Right("right"),
@@ -46,6 +49,14 @@ enum class Move(private val text: String) {
             }
         }
     }
+
+    companion object {
+        val randomEntries: List<Move>
+            get() = entries.shuffled()
+
+        val randomEntry: Move
+            get() = randomEntries.first
+    }
 }
 
 interface IMoveStrategy {
@@ -61,7 +72,7 @@ class MoveUp: IMoveStrategy {
 class DontDie: IMoveStrategy {
     override fun move(gameState: GameState): String {
         val currentPos = gameState.playerHeads[gameState.currentPlayer]!!
-        var bla = Move.entries.toTypedArray().map { Pair(it, it.applyToPos(currentPos, gameState))}
+        var bla = Move.randomEntries.toTypedArray().map { Pair(it, it.applyToPos(currentPos, gameState))}
         bla.forEach {
             val (move, pos) = it
             if (gameState.canMoveTo(pos)) {
@@ -83,23 +94,28 @@ class MoveCircle: IMoveStrategy {
 
 class MostOptions: IMoveStrategy {
     override fun move(gameState: GameState): String {
+        val enemiesCanMoveTo = gameState.enemiesCanMoveTo()
         val currentPos = gameState.playerHeads[gameState.currentPlayer]!!
-        var bla = Move.entries.toTypedArray().map { Pair(it, it.applyToPos(currentPos, gameState))}
-        var foo = bla.mapNotNull {
+        var possibleMoves = Move.randomEntries.toTypedArray().map { Pair(it, it.applyToPos(currentPos, gameState))}
+        var movesWithOptionCount = possibleMoves.mapNotNull {
             val (move, pos) = it
             if (gameState.canMoveTo(pos)) {
-                val optionCount = gameState.countOptions(pos)
+                val factor = if (enemiesCanMoveTo.contains(pos)) 0.5 else 1.0
+                val optionCount = gameState.countOptions(pos) * factor
                 Pair(move, optionCount)
             } else {
                 null
             }
         }
 
-        if (foo.isEmpty()) {
-            return Move.Up.toString()
+        if (movesWithOptionCount.isEmpty()) {
+            println("Fallback")
+            return Move.randomEntry.toString()
         }
-
-        foo = foo.sortedBy { it.second }
-        return foo.first.first.toString()
+        println(movesWithOptionCount)
+        movesWithOptionCount = movesWithOptionCount.sortedByDescending { it.second }
+        val result = movesWithOptionCount.first.first.toString()
+        println(result)
+        return result
     }
 }

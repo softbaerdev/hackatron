@@ -24,14 +24,14 @@ class HackatronClient : IHackatronClient {
             }
             "tick" -> {
                 messageSender.send("move|${strategy.move(currentGameState)}")
-                println(currentGameState)
+                Logger.log(currentGameState)
             }
             "game" -> {
                 val widthParsed = parts[1].toInt()
                 val heightParsed = parts[2].toInt()
                 val playerIdParsed = parts[3].toInt()
                 currentGameState = GameState(widthParsed, heightParsed, playerIdParsed)
-                strategy = DontDie()
+                strategy = MostOptions()
             }
             "player" -> {
                 currentGameState.addPlayer(parts[1].toInt())
@@ -41,28 +41,28 @@ class HackatronClient : IHackatronClient {
                 val x = parts[2].toInt()
                 val y = parts[3].toInt()
                 currentGameState.setPlayerHead(playerId, x, y)
-                println("playerId: $playerId, x: $x, y: $y")
+                Logger.log("playerId: $playerId, x: $x, y: $y")
             }
             "die" -> {
                 val playerId = parts[1].toInt()
                 currentGameState.eraseDiedPlayer(playerId)
-                println("playerId: $playerId")
+                Logger.log("playerId: $playerId")
             }
             "win" -> {
                 val wins = parts[1].toInt()
                 val losses = parts[2].toInt()
-                println("wins: $wins, losses: $losses")
+                Logger.log("wins: $wins, losses: $losses")
             }
             "lose" -> {
                 val wins = parts[1].toInt()
                 val losses = parts[2].toInt()
-                println("wins: $wins, losses: $losses")
+                Logger.log("wins: $wins, losses: $losses")
             }
             "error" -> {
-                println("error: ${parts[1]}")
+                Logger.log("error: ${parts[1]}")
             }
             else -> {
-                println("Unknown message type :(")
+                Logger.log("Unknown message type :(")
                 exitProcess(1)
             }
         }
@@ -71,5 +71,6 @@ class HackatronClient : IHackatronClient {
     companion object {
         private const val CLIENT_NAME = "softbaer"
         private const val CLIENT_SECRET = "fnjfdnjfdlkmfdsk"
+        private const val LOGS = true
     }
 }
