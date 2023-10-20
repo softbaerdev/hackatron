@@ -4,9 +4,9 @@ import java.util.Random
 import kotlin.enums.EnumEntries
 
 enum class Move(private val text: String) {
-    Up("up"),
-    Right("right"),
     Down("down"),
+    Right("right"),
+    Up("up"),
     Left("left");
 
     override fun toString(): String {
@@ -52,7 +52,7 @@ enum class Move(private val text: String) {
 
     companion object {
         val randomEntries: List<Move>
-            get() = entries.shuffled()
+            get() = entries
 
         val randomEntry: Move
             get() = randomEntries.first
@@ -92,7 +92,7 @@ class MoveCircle: IMoveStrategy {
     }
 }
 
-class MostOptions: IMoveStrategy {
+class MostOptionsDepth: IMoveStrategy {
     override fun move(gameState: GameState): String {
         val enemiesCanMoveTo = gameState.enemiesCanMoveTo()
         val currentPos = gameState.playerHeads[gameState.currentPlayer]!!
@@ -103,6 +103,66 @@ class MostOptions: IMoveStrategy {
                 val factor = if (enemiesCanMoveTo.contains(pos)) 0.5 else 1.0
                 val optionCount = gameState.countOptions(pos) * factor
                 Pair(move, optionCount)
+            } else {
+                null
+            }
+        }
+
+        if (movesWithOptionCount.isEmpty()) {
+            println("Fallback")
+            return Move.randomEntry.toString()
+        }
+        println(movesWithOptionCount)
+        movesWithOptionCount = movesWithOptionCount.sortedByDescending { it.second }
+        val result = movesWithOptionCount.first.first.toString()
+        println(result)
+        return result
+    }
+}
+class MostOptions: IMoveStrategy {
+    override fun move(gameState: GameState): String {
+        val enemiesCanMoveTo = gameState.enemiesCanMoveTo()
+        val currentPos = gameState.playerHeads[gameState.currentPlayer]!!
+        var possibleMoves = Move.randomEntries.toTypedArray()
+                .map { Pair(it, it.applyToPos(currentPos, gameState))}
+        var movesWithOptionCount = possibleMoves.mapNotNull {
+            val (move, pos) = it
+            if (gameState.canMoveTo(pos)) {
+                val factor = if (enemiesCanMoveTo.contains(pos)) 0.5 else 1.0
+                val optionCount = gameState.countOptions(pos) * factor
+                Pair(move, optionCount)
+            } else {
+                null
+            }
+        }
+
+        if (movesWithOptionCount.isEmpty()) {
+            println("Fallback")
+            return Move.randomEntry.toString()
+        }
+        println(movesWithOptionCount)
+        movesWithOptionCount = movesWithOptionCount.sortedByDescending { it.second }
+        val result = movesWithOptionCount.first.first.toString()
+        println(result)
+        return result
+    }
+}
+
+class AggressiveMostOptions: IMoveStrategy {
+    override fun move(gameState: GameState): String {
+        val enemiesCanMoveTo = gameState.enemiesCanMoveTo()
+        val currentPos = gameState.playerHeads[gameState.currentPlayer]!!
+        var possibleMoves = Move.randomEntries.toTypedArray().map { Pair(it, it.applyToPos(currentPos, gameState))}
+        var movesWithOptionCount = possibleMoves.mapNotNull {
+            val (move, pos) = it
+            if (gameState.canMoveTo(pos)) {
+                val unadjustedOptionCount = gameState.countOptions(pos)
+                val factor = if (enemiesCanMoveTo.contains(pos)) 0.5 else 1.0
+                val optionCount = unadjustedOptionCount * factor
+                val avgEnemyOptions = gameState.enemyOptionCount(pos).average()
+                val adjustedOptionCount = optionCount - (avgEnemyOptions * 0.05)
+                println("opCount: ${unadjustedOptionCount}, canMoveTo: ${optionCount}, aggr: ${adjustedOptionCount}")
+                Pair(move, adjustedOptionCount)
             } else {
                 null
             }

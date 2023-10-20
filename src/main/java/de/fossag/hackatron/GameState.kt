@@ -4,10 +4,23 @@ import java.util.Queue
 
 typealias Coord = Pair<Int, Int>
 
-class GameState(val width: Int, val height: Int, val currentPlayer: Int) {
-    val players: MutableList<Int> = mutableListOf()
-    val playerHeads: MutableMap<Int, Pair<Int, Int>> = mutableMapOf()
-    val board: Array<Array<Int?>> = Array(width) { Array(height) { null } }
+class GameState(
+    val width: Int,
+    val height: Int,
+    val currentPlayer: Int,
+    val players: MutableList<Int> = mutableListOf(),
+    val playerHeads: MutableMap<Int, Pair<Int, Int>> = mutableMapOf(),
+    val board: Array<Array<Int?>> = Array(width) { Array(height) { null } },
+) {
+
+    fun copy() = GameState(
+        width = width,
+        height = height,
+        currentPlayer = currentPlayer,
+        players = players,
+        playerHeads = playerHeads.toMutableMap(),
+        board = board.map { it.copyOf() }.toTypedArray(),
+    )
 
     fun addPlayer(id: Int) {
         players.add(id)
@@ -39,6 +52,25 @@ class GameState(val width: Int, val height: Int, val currentPlayer: Int) {
                 }
             }
         }
+        playerHeads.remove(playerId)
+    }
+
+    fun countOptionsDepth(pos: Coord): Int {
+        val visited = ArrayList<Coord>()
+        val queue = ArrayDeque<Coord>()
+        queue.add(pos)
+        visited.add(pos)
+        while (queue.isNotEmpty()) {
+            val currentPos = queue.removeFirst()
+            var bla = Move.randomEntries.toTypedArray().map {  it.applyToPos(currentPos, this)}
+            bla.forEach {
+                if (canMoveTo(it) && !visited.contains(it) && !queue.contains(it)) {
+                    queue.add(it)
+                }
+            }
+            visited.add(currentPos)
+        }
+        return visited.count()
     }
 
     fun countOptions(pos: Coord): Int {
@@ -57,6 +89,17 @@ class GameState(val width: Int, val height: Int, val currentPlayer: Int) {
             visited.add(currentPos)
         }
         return visited.count()
+    }
+
+    fun enemyOptionCount(selfMoveTo: Coord): List<Int> {
+        val selfCopy = this.copy()
+        selfCopy.addPosition(selfCopy.currentPlayer, selfMoveTo.first, selfMoveTo.second)
+
+        val otherPlayersHead = selfCopy.playerHeads - selfCopy.currentPlayer
+        val enemyOptionCount = otherPlayersHead.values.map {
+            selfCopy.countOptions(it)
+        }
+        return enemyOptionCount
     }
 
     fun enemiesCanMoveTo(): List<Coord> {

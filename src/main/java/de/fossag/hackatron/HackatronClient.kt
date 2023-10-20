@@ -1,6 +1,7 @@
 package de.fossag.hackatron
 
 import kotlin.system.exitProcess
+import kotlin.time.measureTimedValue
 
 class HackatronClient : IHackatronClient {
 
@@ -23,8 +24,12 @@ class HackatronClient : IHackatronClient {
                 messageSender.send("join|$CLIENT_NAME|$CLIENT_SECRET")
             }
             "tick" -> {
-                messageSender.send("move|${strategy.move(currentGameState)}")
+                val timedValue = measureTimedValue {
+                    strategy.move(currentGameState)
+                }
+                messageSender.send("move|${timedValue.value}")
                 Logger.log(currentGameState)
+                println("Calculating move took: ${timedValue.duration}")
             }
             "game" -> {
                 val widthParsed = parts[1].toInt()
@@ -56,6 +61,7 @@ class HackatronClient : IHackatronClient {
             "lose" -> {
                 val wins = parts[1].toInt()
                 val losses = parts[2].toInt()
+                println("died")
                 Logger.log("wins: $wins, losses: $losses")
             }
             "error" -> {
