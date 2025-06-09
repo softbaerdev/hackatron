@@ -1,8 +1,6 @@
 # Hackatron Client/Bot
 
-*A bot that is able to particpate in a game of tron lightcycles*
-
-This is a simple Java client implementation for the FOSS-AG Hackatron.
+*This is a Kotlin client for the Hackatron multiplayer game server. It connects to the game server, handles incoming game messages, and computes moves using pluggable strategies.*
 
 ## Get started
 
