@@ -1,4 +1,6 @@
-# Hackatron Demo Client
+# Hackatron Client/Bot
+
+*A bot that is able to particpate in a game of tron lightcycles*
 
 This is a simple Java client implementation for the FOSS-AG Hackatron.
 
