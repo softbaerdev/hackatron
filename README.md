@@ -1,6 +1,6 @@
 # Hackatron Client/Bot
 
-*This is a Kotlin client for the Hackatron multiplayer game server. It connects to the game server, handles incoming game messages, and computes moves using pluggable strategies.*
+*TThis is a Kotlin client for the Hackatron multiplayer game server — a 2D lightcycle-style game inspired by Tron. Each player controls a moving entity that leaves a trail behind; colliding with any trail results in elimination. The client connects to the game server, handles incoming messages, and computes moves using pluggable strategies.*
 
 ## Get started
 
